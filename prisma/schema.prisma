@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("user") // user, admin
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  articles      Article[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// News Article model
+model Article {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  summary      String
+  content      String
+  imageUrl     String?
+  category     String
+  tags         String        // JSON array stored as string
+  published    Boolean       @default(false)
+  featured     Boolean       @default(false)
+  authorId     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publishedAt  DateTime?
+
+  author       User          @relation(fields: [authorId], references: [id])
+  perspectives Perspective[]
+}
+
+// Avatar persona model
+model Avatar {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  title         String        // e.g., "Ancient Philosopher", "16th President"
+  description   String        // Short bio/description
+  imageUrl      String?
+  personality   String        // Detailed personality traits (JSON)
+  speakingStyle String        // How they communicate
+  expertise     String        // Areas of knowledge
+  quirks        String        // Unique characteristics
+  category      String        // philosopher, historical, object, character, professional
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  perspectives  Perspective[]
+}
+
+// Avatar's perspective on an article
+model Perspective {
+  id          String   @id @default(cuid())
+  articleId   String
+  avatarId    String
+  content     String   // The avatar's analysis/perspective
+  headline    String   // Avatar's headline for their take
+  keyPoints   String   // JSON array of key points
+  sentiment   String   // positive, negative, neutral, mixed
+  generated   Boolean  @default(false) // Was it AI-generated?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  avatar      Avatar   @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, avatarId])
+}
