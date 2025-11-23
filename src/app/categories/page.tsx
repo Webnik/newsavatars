@@ -21,7 +21,7 @@ export default async function CategoriesPage() {
   })
 
   // Group articles by category
-  const categories = articles.reduce((acc, article) => {
+  const categories = articles.reduce((acc: Record<string, typeof articles>, article: typeof articles[0]) => {
     if (!acc[article.category]) {
       acc[article.category] = []
     }
@@ -73,7 +73,7 @@ export default async function CategoriesPage() {
             {category}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categoryArticles.map((article) => (
+            {(categoryArticles as typeof articles).map((article: typeof articles[0]) => (
               <ArticleCard
                 key={article.id}
                 article={{

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
+import { createArticleSchema } from "@/lib/validations"
+import { z } from "zod"
 
 // GET all articles (public)
 export async function GET(request: Request) {
@@ -55,7 +57,18 @@ export async function POST(request: Request) {
       )
     }
 
-    const data = await request.json()
+    const body = await request.json()
+
+    // Validate request body
+    const validationResult = createArticleSchema.safeParse(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validationResult.error.issues },
+        { status: 400 }
+      )
+    }
+
+    const data = validationResult.data
 
     // Generate slug from title
     const slug = data.title
@@ -69,11 +82,11 @@ export async function POST(request: Request) {
         slug: `${slug}-${Date.now()}`,
         summary: data.summary,
         content: data.content,
-        imageUrl: data.imageUrl,
+        imageUrl: data.imageUrl || null,
         category: data.category,
-        tags: JSON.stringify(data.tags || []),
-        published: data.published || false,
-        featured: data.featured || false,
+        tags: JSON.stringify(data.tags),
+        published: data.published,
+        featured: data.featured,
         authorId: session.user.id,
         publishedAt: data.published ? new Date() : null
       }
@@ -82,6 +95,14 @@ export async function POST(request: Request) {
     return NextResponse.json(article)
   } catch (error) {
     console.error("Error creating article:", error)
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: "Failed to create article" },
       { status: 500 }

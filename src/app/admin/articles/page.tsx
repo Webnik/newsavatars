@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { PlusCircle, ArrowLeft, Pencil, Trash2 } from "lucide-react"
+import { PlusCircle, ArrowLeft, Pencil } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 export const dynamic = "force-dynamic"
@@ -69,7 +69,7 @@ export default async function AdminArticlesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {articles.map((article) => (
+            {articles.map((article: typeof articles[0]) => (
               <tr key={article.id} className="hover:bg-slate-50">
                 <td className="px-6 py-4">
                   <div>

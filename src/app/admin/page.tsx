@@ -127,7 +127,7 @@ export default async function AdminDashboard() {
           <h2 className="text-lg font-semibold text-slate-900">Recent Articles</h2>
         </div>
         <div className="divide-y">
-          {recentArticles.map((article) => (
+          {recentArticles.map((article: typeof recentArticles[0]) => (
             <Link
               key={article.id}
               href={`/admin/articles/${article.slug}`}

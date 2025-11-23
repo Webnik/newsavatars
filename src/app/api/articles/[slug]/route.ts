@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
+import { updateArticleSchema } from "@/lib/validations"
+import { z } from "zod"
 
 // GET single article by slug
 export async function GET(
@@ -59,26 +61,49 @@ export async function PUT(
     }
 
     const { slug } = await params
-    const data = await request.json()
+    const body = await request.json()
+
+    // Validate request body
+    const validationResult = updateArticleSchema.safeParse(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: validationResult.error.issues },
+        { status: 400 }
+      )
+    }
+
+    const data = validationResult.data
+
+    // Build update data object with only provided fields
+    const updateData: Record<string, unknown> = {}
+    if (data.title !== undefined) updateData.title = data.title
+    if (data.summary !== undefined) updateData.summary = data.summary
+    if (data.content !== undefined) updateData.content = data.content
+    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
+    if (data.category !== undefined) updateData.category = data.category
+    if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags)
+    if (data.published !== undefined) {
+      updateData.published = data.published
+      updateData.publishedAt = data.published ? new Date() : null
+    }
+    if (data.featured !== undefined) updateData.featured = data.featured
 
     const article = await prisma.article.update({
       where: { slug },
-      data: {
-        title: data.title,
-        summary: data.summary,
-        content: data.content,
-        imageUrl: data.imageUrl,
-        category: data.category,
-        tags: JSON.stringify(data.tags || []),
-        published: data.published,
-        featured: data.featured,
-        publishedAt: data.published ? new Date() : null
-      }
+      data: updateData
     })
 
     return NextResponse.json(article)
   } catch (error) {
     console.error("Error updating article:", error)
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
       { error: "Failed to update article" },
       { status: 500 }

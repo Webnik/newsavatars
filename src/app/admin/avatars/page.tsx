@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
+import Image from "next/image"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
@@ -51,7 +52,7 @@ export default async function AdminAvatarsPage() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {avatars.map((avatar) => (
+        {avatars.map((avatar: typeof avatars[0]) => (
           <div
             key={avatar.id}
             className="bg-white rounded-lg shadow-md overflow-hidden"
@@ -60,10 +61,12 @@ export default async function AdminAvatarsPage() {
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {avatar.imageUrl ? (
-                    <img
+                    <Image
                       src={avatar.imageUrl}
                       alt={avatar.name}
-                      className="w-full h-full object-cover"
+                      width={64}
+                      height={64}
+                      className="object-cover"
                     />
                   ) : (
                     <span className="text-2xl font-bold text-slate-400">

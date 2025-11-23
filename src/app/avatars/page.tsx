@@ -15,7 +15,7 @@ export default async function AvatarsPage() {
   })
 
   // Group avatars by category
-  const categories = avatars.reduce((acc, avatar) => {
+  const categories = avatars.reduce((acc: Record<string, typeof avatars>, avatar: typeof avatars[0]) => {
     if (!acc[avatar.category]) {
       acc[avatar.category] = []
     }
@@ -46,7 +46,7 @@ export default async function AvatarsPage() {
             {categoryLabels[category] || category}
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {categoryAvatars.map((avatar) => (
+            {(categoryAvatars as typeof avatars).map((avatar: typeof avatars[0]) => (
               <AvatarCard key={avatar.id} avatar={avatar} />
             ))}
           </div>

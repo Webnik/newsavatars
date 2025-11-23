@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import { PerspectiveCard } from "@/components/PerspectiveCard"
 import { formatDistanceToNow } from "date-fns"
 import { Clock, Tag, User, ArrowLeft } from "lucide-react"
@@ -48,11 +49,12 @@ export default async function ArticlePage({
       <article className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
         {/* Image */}
         {article.imageUrl && (
-          <div className="aspect-video bg-slate-200">
-            <img
+          <div className="relative aspect-video bg-slate-200">
+            <Image
               src={article.imageUrl}
               alt={article.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           </div>
         )}
@@ -91,7 +93,7 @@ export default async function ArticlePage({
 
           {/* Content */}
           <div className="prose prose-slate max-w-none">
-            {article.content.split("\n\n").map((paragraph, i) => (
+            {article.content.split("\n\n").map((paragraph: string, i: number) => (
               <p key={i}>{paragraph}</p>
             ))}
           </div>
@@ -126,7 +128,7 @@ export default async function ArticlePage({
 
         {article.perspectives.length > 0 ? (
           <div className="space-y-6">
-            {article.perspectives.map((perspective) => (
+            {article.perspectives.map((perspective: typeof article.perspectives[0]) => (
               <PerspectiveCard key={perspective.id} perspective={perspective} />
             ))}
           </div>
