@@ -3,7 +3,13 @@ import OpenAI from 'openai'
 // Lazy initialization of OpenAI client
 let openaiClient: OpenAI | null = null
 
-function getOpenAIClient(): OpenAI {
+function getOpenAIClient(): OpenAI | null {
+  // Check if API key is available before instantiating
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn('OPENAI_API_KEY not configured, falling back to demo mode')
+    return null
+  }
+
   if (!openaiClient) {
     openaiClient = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -64,8 +70,15 @@ Provide your response in the following JSON format:
   "sentiment": "positive|negative|neutral|mixed"
 }`
 
+  const openai = getOpenAIClient()
+
+  // If no API key is configured, fall back to demo mode
+  if (!openai) {
+    console.log('Using demo mode for perspective generation')
+    return generateDemoPerspective(avatar, article)
+  }
+
   try {
-    const openai = getOpenAIClient()
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [

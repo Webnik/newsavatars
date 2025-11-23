@@ -1,6 +1,7 @@
 import Link from "next/link"
+import Image from "next/image"
 import { formatDistanceToNow } from "date-fns"
-import { MessageSquare, Clock, Tag } from "lucide-react"
+import { MessageSquare, Clock } from "lucide-react"
 
 interface ArticleCardProps {
   article: {
@@ -37,10 +38,11 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           } aspect-video bg-slate-200`}
         >
           {article.imageUrl ? (
-            <img
+            <Image
               src={article.imageUrl}
               alt={article.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
@@ -90,10 +92,12 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
                   title={p.avatar.name}
                 >
                   {p.avatar.imageUrl ? (
-                    <img
+                    <Image
                       src={p.avatar.imageUrl}
                       alt={p.avatar.name}
-                      className="w-full h-full rounded-full object-cover"
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover"
                     />
                   ) : (
                     p.avatar.name.charAt(0)

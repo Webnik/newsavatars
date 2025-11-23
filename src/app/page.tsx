@@ -122,7 +122,7 @@ export default async function HomePage() {
 
         {latestArticles.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestArticles.map((article) => (
+            {latestArticles.map((article: typeof latestArticles[0]) => (
               <ArticleCard
                 key={article.id}
                 article={{
@@ -161,7 +161,7 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {avatars.map((avatar) => (
+              {avatars.map((avatar: typeof avatars[0]) => (
                 <Link
                   key={avatar.id}
                   href={`/avatar/${avatar.slug}`}

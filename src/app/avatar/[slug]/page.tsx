@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft, MessageSquare } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
@@ -67,10 +68,12 @@ export default async function AvatarPage({
             {/* Avatar Image */}
             <div className="w-32 h-32 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
               {avatar.imageUrl ? (
-                <img
+                <Image
                   src={avatar.imageUrl}
                   alt={avatar.name}
-                  className="w-full h-full object-cover"
+                  width={128}
+                  height={128}
+                  className="object-cover"
                 />
               ) : (
                 <span className="text-5xl font-bold text-slate-400">
@@ -156,7 +159,7 @@ export default async function AvatarPage({
 
         {avatar.perspectives.length > 0 ? (
           <div className="space-y-4">
-            {avatar.perspectives.map((perspective) => (
+            {avatar.perspectives.map((perspective: typeof avatar.perspectives[0]) => (
               <Link
                 key={perspective.id}
                 href={`/article/${perspective.article.slug}`}
@@ -164,11 +167,12 @@ export default async function AvatarPage({
               >
                 <div className="flex">
                   {perspective.article.imageUrl && (
-                    <div className="w-32 h-32 flex-shrink-0">
-                      <img
+                    <div className="relative w-32 h-32 flex-shrink-0">
+                      <Image
                         src={perspective.article.imageUrl}
                         alt={perspective.article.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     </div>
                   )}
